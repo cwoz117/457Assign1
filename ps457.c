@@ -17,57 +17,53 @@ additional PID info.
 //the function name itself.
 int findSwitch(int argLength, char *argp[], char flag){
   int i = 1;
-  int found = 0;
+  int found = -1;
   while (i < argLength){
-    char chArg[strlen(argp[i])];
-    strcpy(chArg, argp[i]);
-    if (chArg[0] == '-'){
-      if (chArg[1] == flag)
-	found  = 1;
+    char *strVal = argp[i];
+    if (strlen(strVal) > 1 && strlen(strVal)< 3){
+      if(strVal[1] == flag){
+	found = i;
+	return found;
+      }
+    } else {
+      printf ("Your parameters must be of the form '-x'\n");
+      exit(1);
     }
     i++;
   }
   return found;
 }
 
+char *buildCommand (char *cmd, char *pid, char *dir){
+  // Create space for the filename
+  char *p;
+  //+3 for the space, "/" and null terminator
+  int size = strlen(cmd) + strlen("/proc/") +
+             strlen(pid) + strlen(dir) + 3;
+  p = malloc(size);
+
+  // Concatenate everything together
+  strcat(p, cmd);
+  strcat(p, " ");
+  strcat(p,"/proc/");
+  strcat(p, pid);
+  strcat(p, "/");
+  strcat(p, dir);
+  strcat(p, "\0");
+
+  return p;
+}
+
 int main(int argc, char *argv[]){
-  printf("hello \n");
-  int c = findSwitch(argc, &argv, 'c');
-  if (c == 1)
-      printf("found c");
-  /* SWITCH CONFIG*/
-  // -p <PID> outputs only the requested PID
-  // -s look in the STAT dir for single-char state info
-  // -U user time consumed (STAT 14th field)
-  // -S system time consumed (STAT 15th field) DEFAULT
-  // -v virtual memory used (STATM 1st field) DEFAULT
-  // -c parent process (cmdline, could be null) DEFAULT
-  
+  char *path;
+  int sw;
+
+  sw = findSwitch(argc, argv, 's');
+  if (sw > 0){
+    path = buildCommand("cat", "2050", "stat");
+    system(path);
+  }
+
+
   return 0;
 }
-/*
-&char[] pidInfo(){
-
-  return 'hello';
-}
-&char[] singleCharState(char[] pid){
-
-  return 'hello';
-}
-&char[] userTimeCons(char[] pid){
-
-  return 'hello';
-}
-&char[] sysTimeCons(char[] pid){
-
-  return 'hello';
-}
-&char[] virMemUsed(char[] pid){
-
-  return 'hello';
-}
-&char[] parentProc(char[] pid){
-
-  return 'hello';
-}
-*/
