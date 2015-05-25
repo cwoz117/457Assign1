@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * *
-                      ps457
-Author: Chris Wozniak
-    ID: 10109820
+   ps457
+   Author: Chris Wozniak
+   ID: 10109820
 
     ps457.c is an extension of the ps command in
 linux enviruments, with switches that expand on
@@ -34,36 +34,83 @@ int findSwitch(int argLength, char *argp[], char flag){
   return found;
 }
 
-char *buildCommand (char *cmd, char *pid, char *dir){
+char *buildCommand (char *cmd, char *pid, char *dir, char *file){
   // Create space for the filename
   char *p;
   //+3 for the space, "/" and null terminator
-  int size = strlen(cmd) + strlen("/proc/") +
-             strlen(pid) + strlen(dir) + 3;
+  int size = strlen(cmd) + strlen(dir) +
+             strlen(pid) + strlen(dir) + 4;
   p = malloc(size);
 
   // Concatenate everything together
   strcat(p, cmd);
   strcat(p, " ");
-  strcat(p,"/proc/");
+  strcat(p, dir);
+  strcat(p, "/");
   strcat(p, pid);
   strcat(p, "/");
-  strcat(p, dir);
+  strcat(p, file);
   strcat(p, "\0");
 
   return p;
+}
+
+char *dataIn(char *builtCmd, int i){
+  File *pipe;
+  pipe = popen(builtCmd, "r");
+  if (pipe == NULL){
+    printf("Unable to open a pipe");
+    exit(1);
+  }
+  // Parse for the i'th variable here, return it.
+  pclose(pipe);
 }
 
 int main(int argc, char *argv[]){
   char *path;
   int sw;
 
+  // Single Character State 
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
-    path = buildCommand("cat", "2050", "stat");
-    system(path);
+    path = buildCommand("", "4429", "stat");
+    dataIn(path, 2);
+    free(path);
   }
 
-  free(path);
+  // User time consumed
+  sw = findSwitch(argc, argv, 'U');
+  if (sw > 0){
+    path = buildCommand("", "4429", "stat");
+    dataIn(path, 13);
+    free(path);
+  }
+
+  // System time consumed
+  sw = findSwitch(argc, argv, 'S');
+  if (sw > 0){
+    path = buildCommand("", "4429", "stat");
+    dataIn(path, 14);
+    free(path);
+  }
+
+  // Virtual Memory consumed
+  sw = findSwitch(argc, argv, 'v');
+  if (sw > 0){
+    path = buildCommand("", "4429", "statm");
+    dataIn(path, 0);
+    free(path);
+  }
+
+  // Command line that started it.
+  sw = findSwitch(argc, argv, 'c');
+  if (sw > 0){
+    path = buildCommand("", "4429", "cmdline");
+    dataIn(path, 14);
+    free(path);
+  }
+
+
+  
   return 0;
 }
