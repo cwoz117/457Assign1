@@ -64,6 +64,6 @@ int main(int argc, char *argv[]){
     system(path);
   }
 
-
+  free(path);
   return 0;
 }
