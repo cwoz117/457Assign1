@@ -1,20 +1,28 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * *
-   ps457
-   Author: Chris Wozniak
-   ID: 10109820
-
-    ps457.c is an extension of the ps command in
-linux enviruments, with switches that expand on
-additional PID info.
- * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                                  ps457                                       *
+*                              Chris Wozniak                                   *
+*                                10109820                                      *
+*                                                                              *
+*             ps457.c is an extension of the ps command in                     *
+*             linux enviruments, with switches that expand on                  *
+*             additional PID info.                                             *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-//Switch lookup takes the arguments, and searches them for
-//a provided switch. As they can be unordered, we must
-//check every location except position 0, which contains
-//the function name itself.
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                               findSwitch                                     *
+*                                                                              *
+*          Switch lookup takes provided args, and searches them for            *
+*          against a switch. As they can be unordered, we must                 *
+*          check every location (except position 0, which contains             *
+*          the function name itself.)                                          *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int findSwitch(int argLength, char *argp[], char flag){
   int i = 1;
   int found = -1;
@@ -34,6 +42,16 @@ int findSwitch(int argLength, char *argp[], char flag){
   return found;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                               buildCommand                                   *
+*                                                                              *
+*          buildCommand takes the multiple substrings needed for               *
+*          the program to run. It takes the substrings and                     *
+*          concatenates them together, allocating the memory to                *
+*          make them fit.                                                      *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *buildCommand (char *cmd, char *pid, char *dir, char *file){
   // Create space for the filename
   char *p;
@@ -55,6 +73,16 @@ char *buildCommand (char *cmd, char *pid, char *dir, char *file){
   return p;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                                dataIn                                        *
+*                                                                              *
+*             dataIn takes the built command, and a counter to                 *
+*             open a pipe, and execute the command. Once we have               *
+*             the output, we then return the information at the                *
+*             i'th position                                                    *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *dataIn(char *builtCmd, int i){
   File *pipe;
   pipe = popen(builtCmd, "r");
@@ -66,11 +94,20 @@ char *dataIn(char *builtCmd, int i){
   pclose(pipe);
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                                  main                                        *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int main(int argc, char *argv[]){
   char *path;
   int sw;
 
-  // Single Character State 
+  // Single Character State
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
     path = buildCommand("", "4429", "stat");
@@ -111,6 +148,6 @@ int main(int argc, char *argv[]){
   }
 
 
-  
+
   return 0;
 }
