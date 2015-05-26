@@ -97,15 +97,37 @@ char *runCmd(char *strCmd, int i){
     printf("Unable to open a pipe");
     exit(1);
   }
-  
+
   fgets(buffer, MAX_BUF, pipe);
   value = strtok(buffer, s);
   while (j <= i){
     value = strtok(NULL, s);
     j ++;
   }
- 
+
   pclose(pipe);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                               printOut                                       *
+*                                                                              *
+*              Takes a character array of output values                        *
+*              and prints them to the screen in an ordered                     *
+*              stream.                                                         *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+void printOut(char *vals){
+
+      for (i = 0; i < 6; i++){
+            if (vals[i] != NULL){
+                  printf("%s", vals[i]);
+            }
+            printf("\n");
+      }
+
+
+
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -119,26 +141,21 @@ char *runCmd(char *strCmd, int i){
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int main(int argc, char *argv[]){
   int i;
-  char *output[6] = '\0';
+  char output[6][9];
   char *path;
   int sw;
 
   output[0] = "2257";
-  
+
   // Single Character State
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
     path = buildCommand("cat", "/proc", "2257", "stat");
-    output[1] = runCmd(path, 2);
-    
+    strcpy(output[1], runCmd(path,2));
     free(path);
   }
 
-  for (i = 0; i < 6; i++){
-    if (output[i] != NULL){
-      printf("%s", output[i]);
-    }
-  }
+  printOut(&output);
   /*
   // User time consumed
   sw = findSwitch(argc, argv, 'U');
