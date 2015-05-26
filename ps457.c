@@ -85,24 +85,26 @@ char *buildCommand (char *cmd, char *dir, char *pid, char *file){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *runCmd(char *strCmd, int i){
+  const int MAX_BUF = 512;
+  const char s[1] = " ";
+  int j = 0;
   char *value;
-  char buffer[1024];
-  File *pipe;
+  char buffer[MAX_BUF];
+  FILE *pipe;
 
   pipe = popen(strCmd, "r");
   if (pipe == NULL){
     printf("Unable to open a pipe");
     exit(1);
   }
-
-  while (fgets(buffer, 1024, pipe) != NULL){
-        printf("%s",path );
- }
-
-  for (int j = 0; j <= i; j++){
-    value = strtok()
-
- }
+  
+  fgets(buffer, MAX_BUF, pipe);
+  value = strtok(buffer, s);
+  while (j <= i){
+    value = strtok(NULL, s);
+    j ++;
+  }
+ 
   pclose(pipe);
 }
 
@@ -116,21 +118,28 @@ char *runCmd(char *strCmd, int i){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int main(int argc, char *argv[]){
+  int i;
+  char *output[6] = '\0';
   char *path;
   int sw;
 
-  path = buildCommand("cat", "", ".", ".");
-  path = runCmd(path, 3);
-
-/*
+  output[0] = "2257";
+  
   // Single Character State
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
-    path = buildCommand("", "/proc", "4429", "stat");
-    runCmd(path, 2);
+    path = buildCommand("cat", "/proc", "2257", "stat");
+    output[1] = runCmd(path, 2);
+    
     free(path);
   }
 
+  for (i = 0; i < 6; i++){
+    if (output[i] != NULL){
+      printf("%s", output[i]);
+    }
+  }
+  /*
   // User time consumed
   sw = findSwitch(argc, argv, 'U');
   if (sw > 0){
