@@ -52,12 +52,13 @@ int findSwitch(int argLength, char *argp[], char flag){
 *          make them fit.                                                      *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-char *buildCommand (char *cmd, char *pid, char *dir, char *file){
+char *buildCommand (char *cmd, char *dir, char *pid, char *file){
   // Create space for the filename
   char *p;
+
   //+3 for the space, "/" and null terminator
   int size = strlen(cmd) + strlen(dir) +
-             strlen(pid) + strlen(dir) + 4;
+             strlen(pid) + strlen(file) + 4;
   p = malloc(size);
 
   // Concatenate everything together
@@ -75,22 +76,33 @@ char *buildCommand (char *cmd, char *pid, char *dir, char *file){
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
-*                                dataIn                                        *
+*                                runCmd                                        *
 *                                                                              *
-*             dataIn takes the built command, and a counter to                 *
+*             runCmd takes the built command, and a counter to                 *
 *             open a pipe, and execute the command. Once we have               *
 *             the output, we then return the information at the                *
 *             i'th position                                                    *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-char *dataIn(char *builtCmd, int i){
+char *runCmd(char *strCmd, int i){
+  char *value;
+  char buffer[1024];
   File *pipe;
-  pipe = popen(builtCmd, "r");
+
+  pipe = popen(strCmd, "r");
   if (pipe == NULL){
     printf("Unable to open a pipe");
     exit(1);
   }
-  // Parse for the i'th variable here, return it.
+
+  while (fgets(buffer, 1024, pipe) != NULL){
+        printf("%s",path );
+ }
+
+  for (int j = 0; j <= i; j++){
+    value = strtok()
+
+ }
   pclose(pipe);
 }
 
@@ -107,11 +119,15 @@ int main(int argc, char *argv[]){
   char *path;
   int sw;
 
+  path = buildCommand("cat", "", ".", ".");
+  path = runCmd(path, 3);
+
+/*
   // Single Character State
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
-    path = buildCommand("", "4429", "stat");
-    dataIn(path, 2);
+    path = buildCommand("", "/proc", "4429", "stat");
+    runCmd(path, 2);
     free(path);
   }
 
@@ -119,7 +135,7 @@ int main(int argc, char *argv[]){
   sw = findSwitch(argc, argv, 'U');
   if (sw > 0){
     path = buildCommand("", "4429", "stat");
-    dataIn(path, 13);
+    runCmd(path, 13);
     free(path);
   }
 
@@ -127,7 +143,7 @@ int main(int argc, char *argv[]){
   sw = findSwitch(argc, argv, 'S');
   if (sw > 0){
     path = buildCommand("", "4429", "stat");
-    dataIn(path, 14);
+    runCmd(path, 14);
     free(path);
   }
 
@@ -135,7 +151,7 @@ int main(int argc, char *argv[]){
   sw = findSwitch(argc, argv, 'v');
   if (sw > 0){
     path = buildCommand("", "4429", "statm");
-    dataIn(path, 0);
+    runCmd(path, 0);
     free(path);
   }
 
@@ -143,11 +159,11 @@ int main(int argc, char *argv[]){
   sw = findSwitch(argc, argv, 'c');
   if (sw > 0){
     path = buildCommand("", "4429", "cmdline");
-    dataIn(path, 14);
+    runCmd(path, 14);
     free(path);
   }
 
 
-
+*/
   return 0;
 }
