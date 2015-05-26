@@ -85,9 +85,9 @@ char *buildCommand (char *cmd, char *dir, char *pid, char *file){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *runCmd(char *strCmd, int i){
-  const int MAX_BUF = 512;
+  const int MAX_BUF = 1024;
   const char s[1] = " ";
-  int j = 0;
+  int j = 1;
   char *value;
   char buffer[MAX_BUF];
   FILE *pipe;
@@ -97,15 +97,19 @@ char *runCmd(char *strCmd, int i){
     printf("Unable to open a pipe");
     exit(1);
   }
+  
+  while(fgets(buffer, MAX_BUF, pipe)!= NULL){
 
-  fgets(buffer, MAX_BUF, pipe);
+  }
+
   value = strtok(buffer, s);
   while (j <= i){
+    // printf("%s\n", value);
     value = strtok(NULL, s);
     j ++;
   }
-
   pclose(pipe);
+  return value;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -117,16 +121,17 @@ char *runCmd(char *strCmd, int i){
 *              stream.                                                         *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-void printOut(char *vals){
+void printOut(char *vals[]){
 
-      for (i = 0; i < 6; i++){
-            if (vals[i] != NULL){
-                  printf("%s", vals[i]);
-            }
-            printf("\n");
-      }
+  int i = 0;
+  
+  for (i = 0; i < 6; i++){
+    if (vals[i] != '\0'){
+      printf("%s\t", vals[i]);
+    }
+  }
 
-
+  printf("\n");
 
 }
 
@@ -140,56 +145,55 @@ void printOut(char *vals){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int main(int argc, char *argv[]){
-  int i;
-  char output[6][9];
+  char *output[6] = {'\0'};
+  char pid[5] = "565\0";
   char *path;
   int sw;
 
-  output[0] = "2257";
+
+  output[0] = pid;
 
   // Single Character State
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
-    path = buildCommand("cat", "/proc", "2257", "stat");
-    strcpy(output[1], runCmd(path,2));
+    path = buildCommand("cat", "/proc", pid, "stat");
+    output[1] = runCmd(path,2);
     free(path);
   }
 
-  printOut(&output);
-  /*
   // User time consumed
-  sw = findSwitch(argc, argv, 'U');
+  sw = 1; // Defaults to be true.
   if (sw > 0){
-    path = buildCommand("", "4429", "stat");
-    runCmd(path, 13);
+    path = buildCommand("cat", "/proc", pid, "stat");
+    output[2] = runCmd(path, 13);
     free(path);
   }
-
   // System time consumed
-  sw = findSwitch(argc, argv, 'S');
+  sw = 1; // Defaults to be true.
   if (sw > 0){
-    path = buildCommand("", "4429", "stat");
-    runCmd(path, 14);
+    path = buildCommand("cat", "/proc", pid, "stat");
+    output[3] = runCmd(path, 14);
     free(path);
   }
-
+  
   // Virtual Memory consumed
   sw = findSwitch(argc, argv, 'v');
   if (sw > 0){
-    path = buildCommand("", "4429", "statm");
-    runCmd(path, 0);
+    path = buildCommand("cat", "/proc", pid, "statm");
+    output[4] =runCmd(path, 0);
     free(path);
   }
-
+  /*
   // Command line that started it.
   sw = findSwitch(argc, argv, 'c');
   if (sw > 0){
-    path = buildCommand("", "4429", "cmdline");
-    runCmd(path, 14);
+    path = buildCommand("", "/proc", pid, "cmdline");
+    output[5] =runCmd(path, 14);
     free(path);
   }
 
 
 */
+  printOut(output);
   return 0;
 }
