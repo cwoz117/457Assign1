@@ -28,15 +28,15 @@ int findSwitch(int argLength, char *argp[], char flag){
   int found = -1;
   while (i < argLength){
     char *strVal = argp[i];
-    if (strlen(strVal) > 1 && strlen(strVal)< 3){
+    //if (strlen(strVal) > 1 && strlen(strVal)< 3){
       if(strVal[1] == flag){
 	found = i;
 	return found;
       }
-    } else {
-      printf ("Your parameters must be of the form '-x'\n");
-      exit(1);
-    }
+    //} else {
+      //printf ("Your parameters must be of the form '-x'\n");
+      //exit(1);
+    //}
     i++;
   }
   return found;
@@ -52,18 +52,16 @@ int findSwitch(int argLength, char *argp[], char flag){
 *          make them fit.                                                      *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-char *buildCommand (char *cmd, char *dir, char *pid, char *file){
+char *buildCommand (char *dir, char *pid, char *file){
   // Create space for the filename
   char *p;
 
   //+3 for the space, "/" and null terminator
-  int size = strlen(cmd) + strlen(dir) +
-             strlen(pid) + strlen(file) + 4;
+  int size = strlen(dir) +
+             strlen(pid) + strlen(file) + 3;
   p = malloc(size);
 
   // Concatenate everything together
-  strcat(p, cmd);
-  strcat(p, " ");
   strcat(p, dir);
   strcat(p, "/");
   strcat(p, pid);
@@ -85,30 +83,30 @@ char *buildCommand (char *cmd, char *dir, char *pid, char *file){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *runCmd(char *strCmd, int i){
-  const int MAX_BUF = 1024;
-  const char s[1] = " ";
+  const char s[] = " \n\0\t";
   int j = 1;
   char *value;
-  char buffer[MAX_BUF];
+  static char buffer[1024];
   FILE *pipe;
 
-  pipe = popen(strCmd, "r");
+  pipe = fopen(strCmd, "r");
   if (pipe == NULL){
     printf("Unable to open a pipe");
     exit(1);
   }
   
-  while(fgets(buffer, MAX_BUF, pipe)!= NULL){
-
+  while(fgets(buffer, 1024, pipe)!= NULL){
+     //printf("%s\n", buffer);
   }
 
   value = strtok(buffer, s);
-  while (j <= i){
-    // printf("%s\n", value);
+  while (j < i){
+    //printf("%s\n", value);
     value = strtok(NULL, s);
     j ++;
   }
-  pclose(pipe);
+
+  fclose(pipe);
   return value;
 }
 
@@ -122,17 +120,50 @@ char *runCmd(char *strCmd, int i){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void printOut(char *vals[]){
-
   int i = 0;
+  printf("  PID\t");
+  if (vals[1] != NULL)
+    printf("  state\t");
+  if (vals[2] != NULL)
+    printf("  utime\t");
+  if (vals[3] != NULL)
+    printf("  stime\t");
+  if (vals[4] != NULL)
+    printf("  vmem\t");
+  if (vals[5] != NULL)
+    printf("  cmdlne\t|");
+  printf("\n");
   
   for (i = 0; i < 6; i++){
-    if (vals[i] != '\0'){
-      printf("%s\t", vals[i]);
+    if (vals[i] != NULL){
+      printf("  %s", vals[i]);
+      printf("\t|");
     }
   }
 
   printf("\n");
 
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                               buildLine                                      *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+void buildLine(char *output[], int argc, char *argv[], char *pid, char s, char file[], int i){  
+  int sw;
+  char *path;
+
+  sw = findSwitch(argc, argv, s);
+  if (sw > 0){
+    path = buildCommand("/proc", pid, file);
+    output[1] = runCmd(path, i);
+    free(path);
+  }
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -145,42 +176,54 @@ void printOut(char *vals[]){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int main(int argc, char *argv[]){
-  char *output[6] = {'\0'};
-  char pid[5] = "565\0";
+  char *output[6] = {NULL};
+  char *pid;
   char *path;
   int sw;
 
-
   output[0] = pid;
+  
+  sw = findSwitch(argc, argv, 'p');
+  if (sw > 0){
+    pid = argv[sw+1];
+    buildLine(output, argc, argv, pid, 's', "stat", 3);
+    buildLine(output, argc, argv, pid, 'U', "stat", 14);
+    buildLine(output, argc, argv, pid, 'S', "stat", 15);
+    buildLine(output, argc, argv, pid, 'v', "statm", 1);
+    //buildLine(output, argc, argv, pid, 'c', "cmdline", 15);
+  } else {
 
+  }
+
+ /*
   // Single Character State
   sw = findSwitch(argc, argv, 's');
   if (sw > 0){
-    path = buildCommand("cat", "/proc", pid, "stat");
-    output[1] = runCmd(path,2);
+    path = buildCommand("/proc", pid, "stat");
+    output[1] = runCmd(path,3);
     free(path);
   }
 
   // User time consumed
-  sw = 1; // Defaults to be true.
+  sw = findSwitch(argc, argv, 'U');
   if (sw > 0){
-    path = buildCommand("cat", "/proc", pid, "stat");
-    output[2] = runCmd(path, 13);
+    path = buildCommand("/proc", pid, "stat");
+    output[2] = runCmd(path, 14);
     free(path);
   }
   // System time consumed
-  sw = 1; // Defaults to be true.
+  sw = findSwitch(argc, argv, 'S');
   if (sw > 0){
-    path = buildCommand("cat", "/proc", pid, "stat");
-    output[3] = runCmd(path, 14);
+    path = buildCommand("/proc", pid, "stat");
+    output[3] = runCmd(path, 15);
     free(path);
   }
   
   // Virtual Memory consumed
   sw = findSwitch(argc, argv, 'v');
   if (sw > 0){
-    path = buildCommand("cat", "/proc", pid, "statm");
-    output[4] =runCmd(path, 0);
+    path = buildCommand("/proc", pid, "statm");
+    output[4] =runCmd(path, 1);
     free(path);
   }
   /*
@@ -188,7 +231,7 @@ int main(int argc, char *argv[]){
   sw = findSwitch(argc, argv, 'c');
   if (sw > 0){
     path = buildCommand("", "/proc", pid, "cmdline");
-    output[5] =runCmd(path, 14);
+    output[5] =runCmd(path, 15);
     free(path);
   }
 
