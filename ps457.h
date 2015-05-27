@@ -21,33 +21,38 @@
 *          gets returned. Otherwise return -1                                  *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-int findSwitch(int argLength, char *argp[]){
+int findSwitch(int argLength, char *argp[], int *swi){
 	int i = 0;
 	int p = -1;
-	int msk = 0;
 
 	while (i< argLength){
-		if (strcmp(argp[i], "-p")) {
-			msk = msk | 1;
+		if (strcmp(argp[i], "-p")== 0) {
+			swi[0] = 1;
+			//printf("%d\n", swi[0]);
 		}
-		if (strcmp(argp[i], "-s")) {
-			msk = msk | 2;
+		if (strcmp(argp[i], "-s") == 0) {
+			swi[1] = 1;
+			//printf("%d\n", swi[1]);
 		}
-		if (strcmp(argp[i], "-U")) {
-			msk = msk | 4;
+		if (strcmp(argp[i], "-U") == 0) {
+			swi[2] = 1;
+			//printf("%d\n", swi[2]);
 		}
-		if (strcmp(argp[i], "-S")) {
-			msk = msk | 8;
+		if (strcmp(argp[i], "-S") == 0) {
+			swi[3] = 1;
+			//printf("%d\n", swi[3]);
 		}
-		if (strcmp(argp[i], "-v")) {
-			msk = msk | 16;
+		if (strcmp(argp[i], "-v") == 0) {
+			swi[4] = 1;
+			//printf("%d\n", swi[4]);
 		}
-		if (strcmp(argp[i], "-c")) {
-			msk = msk | 32;
+		if (strcmp(argp[i], "-c") == 0) {
+			swi[5] = 1;
+			//printf("%d\n", swi[5]);
 		}
 		i++;
 	}
-	return msk;
+	return 0;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

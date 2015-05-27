@@ -62,10 +62,10 @@ printHead(FILE *fd, int mask){
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int main(int argc, char *argv[]){
 
-      int swMsk = 0;
+      int *swMsk[6] = {0};
 
-      swMsk = findSwitch(argc, argv);
-      printf("%d\n", swMsk);
+	
+      	findSwitch(argc, argv, swMsk);
 
 
 
