@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include ps457.h
+#include "ps457.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
@@ -25,6 +25,19 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void printOut(char *vals[]){
   int i = 0;
+ printf("  PID\t");
+ if (vals[1] != NULL)
+    printf("  state\t");
+ if (vals[2] != NULL)
+    printf("  utime\t");
+ if (vals[3] != NULL)
+    printf("  stime\t");
+ if (vals[4] != NULL)
+    printf("  vmem\t");
+ if (vals[5] != NULL)
+    printf("  cmdlne\t|");
+ printf("\n");
+
   for (i = 0; i < 6; i++){
     if (vals[i] != NULL){
       printf("  %s", vals[i]);
@@ -35,21 +48,7 @@ void printOut(char *vals[]){
   printf("\n");
 
 }
-void printHead(){
-      printf("  PID\t");
-      if (vals[1] != NULL)
-        printf("  state\t");
-      if (vals[2] != NULL)
-        printf("  utime\t");
-      if (vals[3] != NULL)
-        printf("  stime\t");
-      if (vals[4] != NULL)
-        printf("  vmem\t");
-      if (vals[5] != NULL)
-        printf("  cmdlne\t|");
-      printf("\n");
 
-}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
@@ -67,7 +66,11 @@ int main(int argc, char *argv[]){
 
       swMask = findSwitch(argc, argv);
       if (swMask & 32){
-            output[0] = argv[pid];
+
+
+            output[0] = findPid(argc, argv);
+
+
             if (swMask & 16)
                   output[1] = getData(buildPath("/proc", argv[pid], "stat"), 3);
             if (swMask & 8)
@@ -78,12 +81,10 @@ int main(int argc, char *argv[]){
                   output[4] = getData(buildPath("/proc", argv[pid], "statm"), 1);
             if (swMask & 1)
                   output[5] = getData(buildPath("/proc", argv[pid], "stat"), 1);
-            printHead();
             printOut(output);
       } else {
             char *pidList;
             int i = 1;
-            printHead();
             while ((pidList = getData("ls /proc"), i) != NULL) {
                   output[0] = pidList;
                   if (swMask & 16)
