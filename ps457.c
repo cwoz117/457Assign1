@@ -63,14 +63,14 @@ printHead(FILE *fd, int mask){
 int main(int argc, char *argv[]){
 
       int *swMsk[6] = {0};
-
+	char *pid;
 	
-      	findSwitch(argc, argv, swMsk);
+      	findSwitch(argc, &argv, &swMsk);
 
-
-
-
-
+	if (swMsk[0] == 1){
+		pid = findPid(argc, &argv[0]);
+		printf("%s\n", pid);
+	}
 
 
 

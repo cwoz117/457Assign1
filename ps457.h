@@ -21,7 +21,7 @@
 *          gets returned. Otherwise return -1                                  *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-int findSwitch(int argLength, char *argp[], int *swi){
+void findSwitch(int argLength, char *argp[], int *swi){
 	int i = 0;
 	int p = -1;
 
@@ -52,7 +52,6 @@ int findSwitch(int argLength, char *argp[], int *swi){
 		}
 		i++;
 	}
-	return 0;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -73,7 +72,7 @@ char *findPid(int ac, char *av[]){
 			}
 		}
 	}
-	return -1;
+	return NULL;
 }
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
