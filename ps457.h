@@ -56,11 +56,11 @@ int findSwitch(int argLength, char *argp[]){
 *                                                                              *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-char *findPid(int ac, char *av){
+char *findPid(int ac, char *av[]){
 	int i;
 	for (i = 0; i < ac; i++){
 		if (strcmp(av[i], "-p")){
-			if (av[i+1] == NULL){
+			if (strcmp(av[i+1], NULL)){
 				printf("error in args");
 				exit(1);
 			} else {

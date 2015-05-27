@@ -65,6 +65,7 @@ int main(int argc, char *argv[]){
       int p;            // points to where the pid is in argv.
       FILE *output;     // holds all output data.
       char buffer[1024];
+      char *pid;
 
       output = fopen (output, "w");
       if (output == NULL){
@@ -74,9 +75,9 @@ int main(int argc, char *argv[]){
 
       swMask = findSwitch(argc, argv);
       printHead(output, swMask);
-
       if (swMask & 32){
-            fprintf(fd, findPid(argc, argv));
+            pid = findPID(argc, argv);
+            fprintf(output, pid);
             if (swMask & 16)
                    fprintf(output, getData(buildPath("/proc", argv[pid], "stat"), 3));
             if (swMask & 8)
