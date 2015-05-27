@@ -28,9 +28,7 @@ int findSwitch(int argLength, char *argp[]){
 
 	while (i< argLength){
 		if (strcmp(argp[i], "-p")) {
-			mask = msk | 1;
-			if (arg[i+1] != NULL)
-				p = i+1;
+			msk = msk | 1;
 		}
 		if (strcmp(argp[i], "-s")) {
 			msk = msk | 2;
