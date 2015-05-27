@@ -21,35 +21,51 @@
 *          gets returned. Otherwise return -1                                  *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-int findSwitch(int argLength, char *argp[], int *mask){
+int findSwitch(int argLength, char *argp[]){
 	int i = 0;
 	int p = -1;
+	int msk = 0;
+
 	while (i< argLength){
 		if (strcmp(argp[i], "-p")) {
-			mask = mask | 1;
+			mask = msk | 1;
 			if (arg[i+1] != NULL)
 				p = i+1;
 		}
 		if (strcmp(argp[i], "-s")) {
-			mask = mask | 2;
+			msk = msk | 2;
 		}
 		if (strcmp(argp[i], "-U")) {
-			mask = mask | 4;
+			msk = msk | 4;
 		}
 		if (strcmp(argp[i], "-S")) {
-			mask = mask | 8;
+			msk = msk | 8;
 		}
 		if (strcmp(argp[i], "-v")) {
-			mask = mask | 16;
+			msk = msk | 16;
 		}
 		if (strcmp(argp[i], "-c")) {
-			mask = mask | 32;
+			msk = msk | 32;
 		}
 		i++;
 	}
-	return p;
+	return msk;
 }
 
+char *findPid(int ac, char *av){
+	int i;
+	for (i = 0; i < ac; i++){
+		if (strcmp(av[i], "-p")){
+			if (av[i+1] == NULL){
+				printf("error in args");
+				exit(1);
+			} else {
+				return av[i+1];
+			}
+		}
+	}
+	return -1;
+}
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
 *                               buildCommand                                   *

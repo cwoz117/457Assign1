@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
       int p;            // points to where the pid is in argv.
       char *output[6];
 
-      p = findSwitch(argc, argv, &swMask);
+      swMask = findSwitch(argc, argv);
       if (swMask & 32){
             output[0] = argv[pid];
             if (swMask & 16)
