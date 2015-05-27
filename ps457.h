@@ -50,6 +50,12 @@ int findSwitch(int argLength, char *argp[]){
 	return msk;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                                              *
+*                               findPid                                        *
+*                                                                              *
+*                                                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *findPid(int ac, char *av){
 	int i;
 	for (i = 0; i < ac; i++){
