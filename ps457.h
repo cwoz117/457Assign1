@@ -15,43 +15,22 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
 *                               findSwitch                                     *
-*                                                                              *
-*          Switch lookup take a bitmask, and populates it with                 *
-*          identified switches. If it identifies a pid, it                     *
-*          gets returned. Otherwise return -1                                  *
+*          parses the argv array for the provided switch, and returns          *
+*          the position where the switch was found.                            *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-void findSwitch(int argLength, char *argp[], int *swi){
-	int i = 0;
-	int p = -1;
-
-	while (i< argLength){
-		if (strcmp(argp[i], "-p")== 0) {
-			swi[0] = 1;
-			//printf("%d\n", swi[0]);
-		}
-		if (strcmp(argp[i], "-s") == 0) {
-			swi[1] = 1;
-			//printf("%d\n", swi[1]);
-		}
-		if (strcmp(argp[i], "-U") == 0) {
-			swi[2] = 1;
-			//printf("%d\n", swi[2]);
-		}
-		if (strcmp(argp[i], "-S") == 0) {
-			swi[3] = 1;
-			//printf("%d\n", swi[3]);
-		}
-		if (strcmp(argp[i], "-v") == 0) {
-			swi[4] = 1;
-			//printf("%d\n", swi[4]);
-		}
-		if (strcmp(argp[i], "-c") == 0) {
-			swi[5] = 1;
-			//printf("%d\n", swi[5]);
+int findSwitch(int argLength, char *argp[], char *f[]){
+	int found = -1;
+	int i = 1;
+	char *p;
+	while (i < argLength){
+		p = strstr(argp[i], f[0]);
+		if (p != NULL){
+			found = i;
 		}
 		i++;
 	}
+	return found;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -60,19 +39,25 @@ void findSwitch(int argLength, char *argp[], int *swi){
 *                                                                              *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-char *findPid(int ac, char *av[]){
-	int i;
-	for (i = 0; i < ac; i++){
-		if (strcmp(av[i], "-p")){
-			if (strcmp(av[i+1], NULL)){
+int findPid(int ac, char *av[], char *f[]){
+	int i = 1;
+	char *p;
+	while (i < ac){
+		p = strstr(av[i], f[0]); //pg.116 ANSI C
+		if (p != NULL){
+			if (av[i+1] == NULL){
 				printf("error in args");
 				exit(1);
 			} else {
-				return av[i+1];
+
+				return i+1;
 			}
+		} else {
+
 		}
+		i++;
 	}
-	return NULL;
+	return -1;
 }
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *                                                                              *
@@ -85,23 +70,25 @@ char *findPid(int ac, char *av[]){
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 char *buildPath (char *dir, char *pid, char *file){
-  // Create space for the filename
-  char *p;
+	// Create space for the filename
+	char *p;
 
-  //+3 for the space, "/" and null terminator
-  int size = strlen(dir) +
-             strlen(pid) + strlen(file) + 3;
-  p = malloc(size);
+	//+3 for the space, "/" and null terminator
+	int size = strlen(dir) +
+	             strlen(pid) + strlen(file) + 3;
+	p = calloc(sizeof(p), size);
 
-  // Concatenate everything together
-  strcat(p, dir);
-  strcat(p, "/");
-  strcat(p, pid);
-  strcat(p, "/");
-  strcat(p, file);
-  strcat(p, "\0");
+	 // Concatenate everything together
+	strcat(p, dir);
+	if (pid != "")
+		strcat(p, "/");
+	strcat(p, pid);
+	if (file != "")
+		strcat(p, "/");
+	strcat(p, file);
+	strcat(p, "\0");
 
-  return p;
+	return p;
 }
 
 
@@ -113,30 +100,31 @@ char *buildPath (char *dir, char *pid, char *file){
 *          the i'th value from it.                                             *
 *                                                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-char getData(char *filePath, int i){
-	int j;				// counter for parsing data stream.
+char *getData(char *filePath, int i){
+	int j = 0;				// counter for parsing data stream.
 	char *value;			// return value.
-	static char buffer[1024];	// buffer for stream.
+	char buffer[128];	// buffer for stream.
+	char *buf;
 	char delim[] = " \n\0\t";	// delimeters for string token.
 	FILE *data;
 
 	// Open the file, and prep the stream.
 	data = fopen(filePath, "r");
 	if (data == NULL){
-		printf("Unable to read file");
+		printf("could not open file %s\n", filePath);
 		exit(1);
 	}
 
 	// Read the data from the file.
-	while (fgets(buffer, 1024, data) != NULL){
-		//debug here if req'd
+	while (j < i){
+		memset(buffer, '\0', 128);
+		fscanf(data, "%s", buffer);
+		j++;
 	}
 
-	// Grab the first token, and parse through.
-	value = strtok(buffer, delim);
-	for (j = 1; j < i; j++){
-		value = strtok(NULL, delim);
-	}
+	buf = (char*) malloc(sizeof(buffer));
+	strcpy(buf, buffer);
 	fclose(data);
-	return value;
+
+	return buf;
 }
